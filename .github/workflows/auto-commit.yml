@@ -1,0 +1,29 @@
+name: Daily Dev Auto Log
+
+on:
+  schedule:
+    - cron: '0 4 * * *'   # Har kuni 09:00 Uzbekistan time (UTC+5)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate 15 commits
+        run: |
+          for i in {1..15}
+          do
+            echo "Update $i - $(date)" >> log.txt
+            git config --global user.name "ruznamatov99"
+            git config --global user.email "your-email@example.com"
+            git add .
+            git commit -m "Daily update $i"
+          done
+
+      - name: Push changes
+        run: |
+          git push
