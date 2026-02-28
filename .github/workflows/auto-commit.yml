@@ -1,29 +1,43 @@
-name: Daily Dev Auto Log
+name: Daily 15 Commits Expert
 
 on:
   schedule:
-    - cron: '0 4 * * *'   # Har kuni 09:00 Uzbekistan time (UTC+5)
-  workflow_dispatch:
+    # Soat 09:37 UZB vaqti (04:37 UTC). 
+    # Toliq soatda emas, g'alati daqiqada qo'yish bandlikdan qochishga yordam beradi.
+    - cron: '37 4 * * *'  
+  workflow_dispatch: # Manuel ishga tushirish tugmasi
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Generate 15 commits
+      - name: Setup Git Configuration
+        run: |
+          git config --global user.name "ruzmamatov99"
+          git config --global user.email "kruzmamatov2010@gmail.com"
+
+      - name: Execute 15 Sequential Commits
         run: |
           for i in {1..15}
           do
-            echo "Update $i - $(date)" >> log.txt
-            git config --global user.name "ruzmamatov99"
-            git config --global user.email "kruzmamatov2010@gmail.com"
-            git add .
-            git commit -m "Daily update $i"
+            echo "Log entry $i: $(date)" >> daily_report.txt
+            git add daily_report.txt
+            # --allow-empty har ehtimolga qarshi xatolikni oldini oladi
+            git commit --allow-empty -m "Professional Update $i: $(date)"
+            # 1 soniya kutish - commitlar vaqti har xil bo'lishi uchun
+            sleep 1 
           done
 
-      - name: Push changes
-        run: |
-          git push
+      - name: Secure Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
