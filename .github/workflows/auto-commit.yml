@@ -1,9 +1,14 @@
-name: Fixed 15 Daily Commits
+name: Strict 15 Daily Commits
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Har kuni O'zbekiston vaqti bilan tonggi 05:00 da (UTC 00:00)
-  workflow_dispatch: # Xohlagan vaqtda qo'lda ishga tushirish uchun
+    - cron: '0 0 * * *' # Faqat kuniga bir marta (UTC 00:00 da)
+  workflow_dispatch: # Faqat o'zingiz tugmani bossangiz ishlaydi
+
+# Bir vaqtning o'zida ikkita skript ishlashini taqiqlash
+concurrency:
+  group: commit-group
+  cancel-in-progress: true
 
 jobs:
   auto-commit:
@@ -12,17 +17,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Generate 15 Commits
+      - name: Run 15 Strict Commits
         run: |
           git config --local user.email "kamolbekrozmamatov@gmail.com"
           git config --local user.name "ruzmamatov99"
           
-          # Aniq 15 marta takrorlanadigan sikl
+          # Aniq 15 marta takrorlanadi
           for i in {1..15}
           do
-            echo "Daily Update $i - $(date)" > daily_log.txt
-            git add daily_log.txt
-            git commit -m "Commit #$i: Daily activity maintenance"
+            echo "Security Update $i - $(date)" > last_activity.txt
+            git add last_activity.txt
+            git commit -m "Daily fix $i/15"
           done
 
       - name: Push Changes
