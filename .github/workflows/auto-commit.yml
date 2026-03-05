@@ -1,38 +1,36 @@
-name: Ultimate 15 Commit Fix
+name: Fixed 15 Commits Daily
 
 on:
   schedule:
-    - cron: '30 23 * * *' # Har kuni O'zbekiston vaqti bilan 04:30 da (Tirbandlik kam vaqtda)
-  workflow_dispatch: 
+    - cron: '0 0 * * *' # Har kuni O'zbekiston vaqti bilan tonggi 05:00 da
+  workflow_dispatch:      # Xohlagan vaqtda "Run workflow" tugmasi orqali ishlatish uchun
 
-# Bu qism eng muhimi: bir vaqtda faqat bitta skript ishlashiga ruxsat beradi
+# Bir vaqtda bir nechta skript ishlashini taqiqlaydi
 concurrency:
-  group: "fixed-15"
+  group: daily-commit-group
   cancel-in-progress: true
 
 jobs:
-  build:
+  auto-commit:
     runs-on: ubuntu-latest
-    # Agar 5 daqiqadan ko'p ishlasa, GitHub o'zi o'chirib yuboradi (Limit)
-    timeout-minutes: 5 
-    
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Hard Reset and 15 Commits
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Generate Exactly 15 Commits
         run: |
           git config --local user.email "kamolbekrozmamatov@gmail.com"
           git config --local user.name "ruzmamatov99"
           
-          # Har doim 15 marta ishlashi uchun qat'iy sikl
+          # Aniq 15 marta takrorlanadi
           for i in {1..15}
           do
-            echo "Maintenance log: $(date)" > maintenance.txt
-            git add maintenance.txt
-            git commit -m "System check $i/15"
+            echo "Maintenance log: $(date) - index $i" > daily_report.txt
+            git add daily_report.txt
+            git commit -m "Daily Activity #$i/15"
           done
-          
-      - name: Push safely
+
+      - name: Push Changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
