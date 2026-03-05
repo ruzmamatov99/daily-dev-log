@@ -1,42 +1,31 @@
-name: Daily 15 Commits Expert
+name: Fixed 15 Daily Commits
 
 on:
   schedule:
-    # Soat 09:37 UZB vaqti (04:37 UTC). 
-    # Toliq soatda emas, g'alati daqiqada qo'yish bandlikdan qochishga yordam beradi.
-    - cron: '37 4 * * *'  
-  workflow_dispatch: # Manuel ishga tushirish tugmasi
+    - cron: '0 0 * * *' # Har kuni O'zbekiston vaqti bilan tonggi 05:00 da (UTC 00:00)
+  workflow_dispatch: # Xohlagan vaqtda qo'lda ishga tushirish uchun
 
 jobs:
-  build:
+  auto-commit:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      - name: Setup Git Configuration
+      - name: Generate 15 Commits
         run: |
-          git config --global user.name "ruzmamatov99"
-          git config --global user.email "kruzmamatov2010@gmail.com"
-
-      - name: Execute 15 Sequential Commits
-        run: |
+          git config --local user.email "kamolbekrozmamatov@gmail.com"
+          git config --local user.name "ruzmamatov99"
+          
+          # Aniq 15 marta takrorlanadigan sikl
           for i in {1..15}
           do
-            echo "Log entry $i: $(date)" >> daily_report.txt
-            git add daily_report.txt
-            # --allow-empty har ehtimolga qarshi xatolikni oldini oladi
-            git commit --allow-empty -m "Professional Update $i: $(date)"
-            # 1 soniya kutish - commitlar vaqti har xil bo'lishi uchun
-            sleep 1 
+            echo "Daily Update $i - $(date)" > daily_log.txt
+            git add daily_log.txt
+            git commit -m "Commit #$i: Daily activity maintenance"
           done
 
-      - name: Secure Push
+      - name: Push Changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
