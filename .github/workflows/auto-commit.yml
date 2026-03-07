@@ -1,34 +1,34 @@
-name: Fixed 15 Commits Daily (No Push Trigger)
+name: Daily 15 Commits Fix
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Har kuni faqat bir marta (O'zbekiston vaqti bilan 05:00 da)
-  workflow_dispatch:      # Faqat o'zingiz "Run workflow" tugmasini bossangiz ishlaydi
+    - cron: '0 0 * * *' # Har kuni O'zbekiston vaqti bilan tonggi 05:00 da
+  workflow_dispatch:      # Xohlagan vaqtda qo'lda ishga tushirish uchun
 
 permissions:
   contents: write
 
 concurrency:
-  group: daily-maintenance
+  group: daily-15-lock
   cancel-in-progress: true
 
 jobs:
-  auto-commit:
+  commit:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Hard Limit 15 Commits
+      - name: Generate Exactly 15 Commits
         run: |
           git config --local user.email "kamolbekrozmamatov@gmail.com"
           git config --local user.name "ruzmamatov99"
           
           for i in {1..15}
           do
-            echo "Daily log update: $(date)" > activity_log.txt
-            git add activity_log.txt
-            git commit -m "System maintainance $i/15"
+            echo "Daily log: $(date) - commit $i" > daily_activity.txt
+            git add daily_activity.txt
+            git commit -m "Auto-maintenance $i/15"
           done
           
           git push origin main
